@@ -127,7 +127,6 @@ def get_stream_data(
                     )
                     access_token = token["accessToken"]
                     headers = {"Authorization": f"Bearer {access_token}"}
-                    import ipdb; ipdb.set_trace()
                     output = requests.post(
                         url=API_ENDPOINT, json=data, headers=headers
                     ).content
@@ -209,6 +208,27 @@ iso = "CAISO"
 node = "0096WD_7_N001"
 start_date = "1/1/2021"
 end_date = "1/2/2021"
+#product_entry = {}
+#data={}
+#product_entry["params"] = {
+#    "iso": iso.upper().replace("ISO-NE", "ISONE"),
+#    "node": node.upper(),
+#    "product": 'energy_rt_5',
+#    "startDate": start_date,
+#    "endDate": end_date,
+#    "useCache": 'false',
+#}
+#product_entry["dataType"] = "AscendISO"
+#
+#data['energy_rt_5'] = product_entry
+#auth_context = adal.AuthenticationContext(AUTHORITY_URL, api_version=None)
+#token = auth_context.acquire_token_with_client_credentials(
+#    RESOURCE, CLIENT_ID, CLIENT_SECRET
+#)
+#access_token = token["accessToken"]
+#headers = {"Authorization": f"Bearer {access_token}"}
+#out = requests.post(url=API_ENDPOINT, json=data, headers=headers)
+#print(out)
 
 output_file = "temp.csv"
 get_stream_data(node, iso, start_date, end_date, output_file, require_energy=False)
