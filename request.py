@@ -217,7 +217,7 @@ def get_stream_data(iso, node, start_date, end_date):
         if iso.lower().replace('iso-ne', 'isone') in ["pjm", "nyiso", "isone"]:
             final_df = final_df.rename(columns={'energy_rt_5': 'energy_rt'})
 
-        if (right_date.year == pd.datetime.now().year):
+        if right_date.year == pd.datetime.now().year:
             final_df = final_df.reset_index()
             final_df = final_df.loc[final_df['timestamp'] < pd.datetime.now()].set_index('timestamp')
         output_dfs_list.append(final_df)

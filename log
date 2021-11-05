@@ -4,143 +4,69 @@ CALLING TRAVERSE
 
 
 INFO - Attempting ping test, attempt 0 of 5
-DEBUG - d3556573-0ecb-43ee-9c5f-de9a7ba20af6 - Authority:Performing instance discovery: ...
-DEBUG - d3556573-0ecb-43ee-9c5f-de9a7ba20af6 - Authority:Performing static instance discovery
-DEBUG - d3556573-0ecb-43ee-9c5f-de9a7ba20af6 - Authority:Authority validated via static instance discovery
-DEBUG - d3556573-0ecb-43ee-9c5f-de9a7ba20af6 - TokenRequest:Getting token with client credentials.
-DEBUG - d3556573-0ecb-43ee-9c5f-de9a7ba20af6 - TokenRequest:No user_id passed for cache query
-DEBUG - d3556573-0ecb-43ee-9c5f-de9a7ba20af6 - CacheDriver:finding with query keys: {'_clientId': '...'}
-DEBUG - d3556573-0ecb-43ee-9c5f-de9a7ba20af6 - CacheDriver:Looking for potential cache entries: {'_clientId': '...'}
-DEBUG - d3556573-0ecb-43ee-9c5f-de9a7ba20af6 - CacheDriver:Found 0 potential entries.
+DEBUG - eeb390df-00cc-4474-96f2-9059358ddce6 - Authority:Performing instance discovery: ...
+DEBUG - eeb390df-00cc-4474-96f2-9059358ddce6 - Authority:Performing static instance discovery
+DEBUG - eeb390df-00cc-4474-96f2-9059358ddce6 - Authority:Authority validated via static instance discovery
+DEBUG - eeb390df-00cc-4474-96f2-9059358ddce6 - TokenRequest:Getting token with client credentials.
+DEBUG - eeb390df-00cc-4474-96f2-9059358ddce6 - TokenRequest:No user_id passed for cache query
+DEBUG - eeb390df-00cc-4474-96f2-9059358ddce6 - CacheDriver:finding with query keys: {'_clientId': '...'}
+DEBUG - eeb390df-00cc-4474-96f2-9059358ddce6 - CacheDriver:Looking for potential cache entries: {'_clientId': '...'}
+DEBUG - eeb390df-00cc-4474-96f2-9059358ddce6 - CacheDriver:Found 0 potential entries.
 DEBUG - Starting new HTTPS connection (1): login.microsoftonline.com:443
 DEBUG - https://login.microsoftonline.com:443 "POST /aadevland.onmicrosoft.com/oauth2/token HTTP/1.1" 200 1462
-DEBUG - d3556573-0ecb-43ee-9c5f-de9a7ba20af6 - OAuth2Client:Get Token Server returned this correlation_id: d3556573-0ecb-43ee-9c5f-de9a7ba20af6
-DEBUG - d3556573-0ecb-43ee-9c5f-de9a7ba20af6 - CacheDriver:Adding entry AccessTokenId: b'5ctWVxi27ZRVmyb0KjJMVYxlBlCwciD8ObYkhrouUZ8='
-DEBUG - d3556573-0ecb-43ee-9c5f-de9a7ba20af6 - CacheDriver:Added entry is MRRT
+DEBUG - eeb390df-00cc-4474-96f2-9059358ddce6 - OAuth2Client:Get Token Server returned this correlation_id: eeb390df-00cc-4474-96f2-9059358ddce6
+DEBUG - eeb390df-00cc-4474-96f2-9059358ddce6 - CacheDriver:Adding entry AccessTokenId: b'J5gePkYsSRju2CeMiwxoii6rs/CQG69zuk1urGBONEg='
+DEBUG - eeb390df-00cc-4474-96f2-9059358ddce6 - CacheDriver:Added entry is MRRT
 DEBUG - Starting new HTTPS connection (1): ascend-data-api-dev.azurewebsites.net:443
 DEBUG - https://ascend-data-api-dev.azurewebsites.net:443 "POST /ping-test HTTP/1.1" 200 25
 INFO - Harvesting data for CAISO node: 0096WD_7_N001
 INFO - Harvesting data for 2020-01-01 00:00:00 to 2020-01-02 00:00:00
 INFO - Harvesting data for product: energy_da
-DEBUG - 7f6d71d9-9472-4539-a5b1-59ad5a723168 - Authority:Performing instance discovery: ...
-DEBUG - 7f6d71d9-9472-4539-a5b1-59ad5a723168 - Authority:Performing static instance discovery
-DEBUG - 7f6d71d9-9472-4539-a5b1-59ad5a723168 - Authority:Authority validated via static instance discovery
-DEBUG - 7f6d71d9-9472-4539-a5b1-59ad5a723168 - TokenRequest:Getting token with client credentials.
-DEBUG - 7f6d71d9-9472-4539-a5b1-59ad5a723168 - TokenRequest:No user_id passed for cache query
-DEBUG - 7f6d71d9-9472-4539-a5b1-59ad5a723168 - CacheDriver:finding with query keys: {'_clientId': '...'}
-DEBUG - 7f6d71d9-9472-4539-a5b1-59ad5a723168 - CacheDriver:Looking for potential cache entries: {'_clientId': '...'}
-DEBUG - 7f6d71d9-9472-4539-a5b1-59ad5a723168 - CacheDriver:Found 0 potential entries.
+DEBUG - e80ab4d5-cd2a-453d-bbf3-c7e8a0c7831e - Authority:Performing instance discovery: ...
+DEBUG - e80ab4d5-cd2a-453d-bbf3-c7e8a0c7831e - Authority:Performing static instance discovery
+DEBUG - e80ab4d5-cd2a-453d-bbf3-c7e8a0c7831e - Authority:Authority validated via static instance discovery
+DEBUG - e80ab4d5-cd2a-453d-bbf3-c7e8a0c7831e - TokenRequest:Getting token with client credentials.
+DEBUG - e80ab4d5-cd2a-453d-bbf3-c7e8a0c7831e - TokenRequest:No user_id passed for cache query
+DEBUG - e80ab4d5-cd2a-453d-bbf3-c7e8a0c7831e - CacheDriver:finding with query keys: {'_clientId': '...'}
+DEBUG - e80ab4d5-cd2a-453d-bbf3-c7e8a0c7831e - CacheDriver:Looking for potential cache entries: {'_clientId': '...'}
+DEBUG - e80ab4d5-cd2a-453d-bbf3-c7e8a0c7831e - CacheDriver:Found 0 potential entries.
 DEBUG - Starting new HTTPS connection (1): login.microsoftonline.com:443
 DEBUG - https://login.microsoftonline.com:443 "POST /aadevland.onmicrosoft.com/oauth2/token HTTP/1.1" 200 1462
-DEBUG - 7f6d71d9-9472-4539-a5b1-59ad5a723168 - OAuth2Client:Get Token Server returned this correlation_id: 7f6d71d9-9472-4539-a5b1-59ad5a723168
-DEBUG - 7f6d71d9-9472-4539-a5b1-59ad5a723168 - CacheDriver:Adding entry AccessTokenId: b'77Z+n3nVGcAxO7zhvmEiBmTVebca1W9nhkK5h1GbBH0='
-DEBUG - 7f6d71d9-9472-4539-a5b1-59ad5a723168 - CacheDriver:Added entry is MRRT
+DEBUG - e80ab4d5-cd2a-453d-bbf3-c7e8a0c7831e - OAuth2Client:Get Token Server returned this correlation_id: e80ab4d5-cd2a-453d-bbf3-c7e8a0c7831e
+DEBUG - e80ab4d5-cd2a-453d-bbf3-c7e8a0c7831e - CacheDriver:Adding entry AccessTokenId: b'Zz+1nCwVr66lCB3l894G5UdwV9oBDRECOpQjOhT9r4M='
+DEBUG - e80ab4d5-cd2a-453d-bbf3-c7e8a0c7831e - CacheDriver:Added entry is MRRT
 DEBUG - Starting new HTTPS connection (1): ascend-data-api-dev.azurewebsites.net:443
 DEBUG - https://ascend-data-api-dev.azurewebsites.net:443 "POST /get-data HTTP/1.1" 200 9513
 INFO - Harvesting data for product: energy_rt_5
-DEBUG - 41d5b113-99f6-4f0e-b8c3-ee3ad778f62f - Authority:Performing instance discovery: ...
-DEBUG - 41d5b113-99f6-4f0e-b8c3-ee3ad778f62f - Authority:Performing static instance discovery
-DEBUG - 41d5b113-99f6-4f0e-b8c3-ee3ad778f62f - Authority:Authority validated via static instance discovery
-DEBUG - 41d5b113-99f6-4f0e-b8c3-ee3ad778f62f - TokenRequest:Getting token with client credentials.
-DEBUG - 41d5b113-99f6-4f0e-b8c3-ee3ad778f62f - TokenRequest:No user_id passed for cache query
-DEBUG - 41d5b113-99f6-4f0e-b8c3-ee3ad778f62f - CacheDriver:finding with query keys: {'_clientId': '...'}
-DEBUG - 41d5b113-99f6-4f0e-b8c3-ee3ad778f62f - CacheDriver:Looking for potential cache entries: {'_clientId': '...'}
-DEBUG - 41d5b113-99f6-4f0e-b8c3-ee3ad778f62f - CacheDriver:Found 0 potential entries.
+DEBUG - b44f3991-227b-42ae-a85d-6971b9658533 - Authority:Performing instance discovery: ...
+DEBUG - b44f3991-227b-42ae-a85d-6971b9658533 - Authority:Performing static instance discovery
+DEBUG - b44f3991-227b-42ae-a85d-6971b9658533 - Authority:Authority validated via static instance discovery
+DEBUG - b44f3991-227b-42ae-a85d-6971b9658533 - TokenRequest:Getting token with client credentials.
+DEBUG - b44f3991-227b-42ae-a85d-6971b9658533 - TokenRequest:No user_id passed for cache query
+DEBUG - b44f3991-227b-42ae-a85d-6971b9658533 - CacheDriver:finding with query keys: {'_clientId': '...'}
+DEBUG - b44f3991-227b-42ae-a85d-6971b9658533 - CacheDriver:Looking for potential cache entries: {'_clientId': '...'}
+DEBUG - b44f3991-227b-42ae-a85d-6971b9658533 - CacheDriver:Found 0 potential entries.
 DEBUG - Starting new HTTPS connection (1): login.microsoftonline.com:443
 DEBUG - https://login.microsoftonline.com:443 "POST /aadevland.onmicrosoft.com/oauth2/token HTTP/1.1" 200 1462
-DEBUG - 41d5b113-99f6-4f0e-b8c3-ee3ad778f62f - OAuth2Client:Get Token Server returned this correlation_id: 41d5b113-99f6-4f0e-b8c3-ee3ad778f62f
-DEBUG - 41d5b113-99f6-4f0e-b8c3-ee3ad778f62f - CacheDriver:Adding entry AccessTokenId: b'0UxqGchJ6J0BmMfBSUK0Riv1O2H/NcDP5/En9mtSRXY='
-DEBUG - 41d5b113-99f6-4f0e-b8c3-ee3ad778f62f - CacheDriver:Added entry is MRRT
+DEBUG - b44f3991-227b-42ae-a85d-6971b9658533 - OAuth2Client:Get Token Server returned this correlation_id: b44f3991-227b-42ae-a85d-6971b9658533
+DEBUG - b44f3991-227b-42ae-a85d-6971b9658533 - CacheDriver:Adding entry AccessTokenId: b'nlnpPneDJGusGOmijTCOEGdmz48YK88yUiu7OLa1LCw='
+DEBUG - b44f3991-227b-42ae-a85d-6971b9658533 - CacheDriver:Added entry is MRRT
 DEBUG - Starting new HTTPS connection (1): ascend-data-api-dev.azurewebsites.net:443
 DEBUG - https://ascend-data-api-dev.azurewebsites.net:443 "POST /get-data HTTP/1.1" 200 9539
 INFO - Harvesting data for product: energy_rt_15
-DEBUG - f938ecb0-ade8-4100-a9cc-0b3d4dbeafa1 - Authority:Performing instance discovery: ...
-DEBUG - f938ecb0-ade8-4100-a9cc-0b3d4dbeafa1 - Authority:Performing static instance discovery
-DEBUG - f938ecb0-ade8-4100-a9cc-0b3d4dbeafa1 - Authority:Authority validated via static instance discovery
-DEBUG - f938ecb0-ade8-4100-a9cc-0b3d4dbeafa1 - TokenRequest:Getting token with client credentials.
-DEBUG - f938ecb0-ade8-4100-a9cc-0b3d4dbeafa1 - TokenRequest:No user_id passed for cache query
-DEBUG - f938ecb0-ade8-4100-a9cc-0b3d4dbeafa1 - CacheDriver:finding with query keys: {'_clientId': '...'}
-DEBUG - f938ecb0-ade8-4100-a9cc-0b3d4dbeafa1 - CacheDriver:Looking for potential cache entries: {'_clientId': '...'}
-DEBUG - f938ecb0-ade8-4100-a9cc-0b3d4dbeafa1 - CacheDriver:Found 0 potential entries.
+DEBUG - d69e2254-3d06-4709-b1e5-d9091fd61d9d - Authority:Performing instance discovery: ...
+DEBUG - d69e2254-3d06-4709-b1e5-d9091fd61d9d - Authority:Performing static instance discovery
+DEBUG - d69e2254-3d06-4709-b1e5-d9091fd61d9d - Authority:Authority validated via static instance discovery
+DEBUG - d69e2254-3d06-4709-b1e5-d9091fd61d9d - TokenRequest:Getting token with client credentials.
+DEBUG - d69e2254-3d06-4709-b1e5-d9091fd61d9d - TokenRequest:No user_id passed for cache query
+DEBUG - d69e2254-3d06-4709-b1e5-d9091fd61d9d - CacheDriver:finding with query keys: {'_clientId': '...'}
+DEBUG - d69e2254-3d06-4709-b1e5-d9091fd61d9d - CacheDriver:Looking for potential cache entries: {'_clientId': '...'}
+DEBUG - d69e2254-3d06-4709-b1e5-d9091fd61d9d - CacheDriver:Found 0 potential entries.
 DEBUG - Starting new HTTPS connection (1): login.microsoftonline.com:443
 DEBUG - https://login.microsoftonline.com:443 "POST /aadevland.onmicrosoft.com/oauth2/token HTTP/1.1" 200 1462
-DEBUG - f938ecb0-ade8-4100-a9cc-0b3d4dbeafa1 - OAuth2Client:Get Token Server returned this correlation_id: f938ecb0-ade8-4100-a9cc-0b3d4dbeafa1
-DEBUG - f938ecb0-ade8-4100-a9cc-0b3d4dbeafa1 - CacheDriver:Adding entry AccessTokenId: b'tgqgYM1ESIm8uqn8ZWZ9C79TDRXHTclbnxdc6kjEzTg='
-DEBUG - f938ecb0-ade8-4100-a9cc-0b3d4dbeafa1 - CacheDriver:Added entry is MRRT
-DEBUG - Starting new HTTPS connection (1): ascend-data-api-dev.azurewebsites.net:443
-DEBUG - https://ascend-data-api-dev.azurewebsites.net:443 "POST /get-data HTTP/1.1" 200 9588
-INFO - Processing product: energy_da
-INFO - Processing product: energy_rt_5
-INFO - Processing product: energy_rt_15
-DEBUG - 
-
-CALLING TRAVERSE
-
-
-INFO - Attempting ping test, attempt 0 of 5
-DEBUG - a844d9c9-8e0c-499e-890f-82cfeab578e8 - Authority:Performing instance discovery: ...
-DEBUG - a844d9c9-8e0c-499e-890f-82cfeab578e8 - Authority:Performing static instance discovery
-DEBUG - a844d9c9-8e0c-499e-890f-82cfeab578e8 - Authority:Authority validated via static instance discovery
-DEBUG - a844d9c9-8e0c-499e-890f-82cfeab578e8 - TokenRequest:Getting token with client credentials.
-DEBUG - a844d9c9-8e0c-499e-890f-82cfeab578e8 - TokenRequest:No user_id passed for cache query
-DEBUG - a844d9c9-8e0c-499e-890f-82cfeab578e8 - CacheDriver:finding with query keys: {'_clientId': '...'}
-DEBUG - a844d9c9-8e0c-499e-890f-82cfeab578e8 - CacheDriver:Looking for potential cache entries: {'_clientId': '...'}
-DEBUG - a844d9c9-8e0c-499e-890f-82cfeab578e8 - CacheDriver:Found 0 potential entries.
-DEBUG - Starting new HTTPS connection (1): login.microsoftonline.com:443
-DEBUG - https://login.microsoftonline.com:443 "POST /aadevland.onmicrosoft.com/oauth2/token HTTP/1.1" 200 1462
-DEBUG - a844d9c9-8e0c-499e-890f-82cfeab578e8 - OAuth2Client:Get Token Server returned this correlation_id: a844d9c9-8e0c-499e-890f-82cfeab578e8
-DEBUG - a844d9c9-8e0c-499e-890f-82cfeab578e8 - CacheDriver:Adding entry AccessTokenId: b'780/xU78ao73cfGPrelEjve9p2IgepElq77yXlc5juY='
-DEBUG - a844d9c9-8e0c-499e-890f-82cfeab578e8 - CacheDriver:Added entry is MRRT
-DEBUG - Starting new HTTPS connection (1): ascend-data-api-dev.azurewebsites.net:443
-DEBUG - https://ascend-data-api-dev.azurewebsites.net:443 "POST /ping-test HTTP/1.1" 200 25
-INFO - Harvesting data for CAISO node: 0096WD_7_N001
-INFO - Harvesting data for 2020-01-01 00:00:00 to 2020-01-02 00:00:00
-INFO - Harvesting data for product: energy_da
-DEBUG - efefa8c2-08cb-4c33-9c78-aba134c8a1a8 - Authority:Performing instance discovery: ...
-DEBUG - efefa8c2-08cb-4c33-9c78-aba134c8a1a8 - Authority:Performing static instance discovery
-DEBUG - efefa8c2-08cb-4c33-9c78-aba134c8a1a8 - Authority:Authority validated via static instance discovery
-DEBUG - efefa8c2-08cb-4c33-9c78-aba134c8a1a8 - TokenRequest:Getting token with client credentials.
-DEBUG - efefa8c2-08cb-4c33-9c78-aba134c8a1a8 - TokenRequest:No user_id passed for cache query
-DEBUG - efefa8c2-08cb-4c33-9c78-aba134c8a1a8 - CacheDriver:finding with query keys: {'_clientId': '...'}
-DEBUG - efefa8c2-08cb-4c33-9c78-aba134c8a1a8 - CacheDriver:Looking for potential cache entries: {'_clientId': '...'}
-DEBUG - efefa8c2-08cb-4c33-9c78-aba134c8a1a8 - CacheDriver:Found 0 potential entries.
-DEBUG - Starting new HTTPS connection (1): login.microsoftonline.com:443
-DEBUG - https://login.microsoftonline.com:443 "POST /aadevland.onmicrosoft.com/oauth2/token HTTP/1.1" 200 1462
-DEBUG - efefa8c2-08cb-4c33-9c78-aba134c8a1a8 - OAuth2Client:Get Token Server returned this correlation_id: efefa8c2-08cb-4c33-9c78-aba134c8a1a8
-DEBUG - efefa8c2-08cb-4c33-9c78-aba134c8a1a8 - CacheDriver:Adding entry AccessTokenId: b'FWtIPBW/RW/vrKqcEmF9YyTuPwo3NMnYIR8/e8CvgJI='
-DEBUG - efefa8c2-08cb-4c33-9c78-aba134c8a1a8 - CacheDriver:Added entry is MRRT
-DEBUG - Starting new HTTPS connection (1): ascend-data-api-dev.azurewebsites.net:443
-DEBUG - https://ascend-data-api-dev.azurewebsites.net:443 "POST /get-data HTTP/1.1" 200 9513
-INFO - Harvesting data for product: energy_rt_5
-DEBUG - c89a32ec-dfbd-4c81-91be-cc1e74e1b108 - Authority:Performing instance discovery: ...
-DEBUG - c89a32ec-dfbd-4c81-91be-cc1e74e1b108 - Authority:Performing static instance discovery
-DEBUG - c89a32ec-dfbd-4c81-91be-cc1e74e1b108 - Authority:Authority validated via static instance discovery
-DEBUG - c89a32ec-dfbd-4c81-91be-cc1e74e1b108 - TokenRequest:Getting token with client credentials.
-DEBUG - c89a32ec-dfbd-4c81-91be-cc1e74e1b108 - TokenRequest:No user_id passed for cache query
-DEBUG - c89a32ec-dfbd-4c81-91be-cc1e74e1b108 - CacheDriver:finding with query keys: {'_clientId': '...'}
-DEBUG - c89a32ec-dfbd-4c81-91be-cc1e74e1b108 - CacheDriver:Looking for potential cache entries: {'_clientId': '...'}
-DEBUG - c89a32ec-dfbd-4c81-91be-cc1e74e1b108 - CacheDriver:Found 0 potential entries.
-DEBUG - Starting new HTTPS connection (1): login.microsoftonline.com:443
-DEBUG - https://login.microsoftonline.com:443 "POST /aadevland.onmicrosoft.com/oauth2/token HTTP/1.1" 200 1462
-DEBUG - c89a32ec-dfbd-4c81-91be-cc1e74e1b108 - OAuth2Client:Get Token Server returned this correlation_id: c89a32ec-dfbd-4c81-91be-cc1e74e1b108
-DEBUG - c89a32ec-dfbd-4c81-91be-cc1e74e1b108 - CacheDriver:Adding entry AccessTokenId: b'1mx4EM8uO0QiSs0ydrXS8nO8yZpGe1DFtbrtyscdP8Y='
-DEBUG - c89a32ec-dfbd-4c81-91be-cc1e74e1b108 - CacheDriver:Added entry is MRRT
-DEBUG - Starting new HTTPS connection (1): ascend-data-api-dev.azurewebsites.net:443
-DEBUG - https://ascend-data-api-dev.azurewebsites.net:443 "POST /get-data HTTP/1.1" 200 9539
-INFO - Harvesting data for product: energy_rt_15
-DEBUG - d9dc4135-14bc-48ed-a4ad-d0934d7e0d07 - Authority:Performing instance discovery: ...
-DEBUG - d9dc4135-14bc-48ed-a4ad-d0934d7e0d07 - Authority:Performing static instance discovery
-DEBUG - d9dc4135-14bc-48ed-a4ad-d0934d7e0d07 - Authority:Authority validated via static instance discovery
-DEBUG - d9dc4135-14bc-48ed-a4ad-d0934d7e0d07 - TokenRequest:Getting token with client credentials.
-DEBUG - d9dc4135-14bc-48ed-a4ad-d0934d7e0d07 - TokenRequest:No user_id passed for cache query
-DEBUG - d9dc4135-14bc-48ed-a4ad-d0934d7e0d07 - CacheDriver:finding with query keys: {'_clientId': '...'}
-DEBUG - d9dc4135-14bc-48ed-a4ad-d0934d7e0d07 - CacheDriver:Looking for potential cache entries: {'_clientId': '...'}
-DEBUG - d9dc4135-14bc-48ed-a4ad-d0934d7e0d07 - CacheDriver:Found 0 potential entries.
-DEBUG - Starting new HTTPS connection (1): login.microsoftonline.com:443
-DEBUG - https://login.microsoftonline.com:443 "POST /aadevland.onmicrosoft.com/oauth2/token HTTP/1.1" 200 1462
-DEBUG - d9dc4135-14bc-48ed-a4ad-d0934d7e0d07 - OAuth2Client:Get Token Server returned this correlation_id: d9dc4135-14bc-48ed-a4ad-d0934d7e0d07
-DEBUG - d9dc4135-14bc-48ed-a4ad-d0934d7e0d07 - CacheDriver:Adding entry AccessTokenId: b'KtixZG1GtiaiRPIAUjy/o9n5ingGMLApEmQZ7cMdgE4='
-DEBUG - d9dc4135-14bc-48ed-a4ad-d0934d7e0d07 - CacheDriver:Added entry is MRRT
+DEBUG - d69e2254-3d06-4709-b1e5-d9091fd61d9d - OAuth2Client:Get Token Server returned this correlation_id: d69e2254-3d06-4709-b1e5-d9091fd61d9d
+DEBUG - d69e2254-3d06-4709-b1e5-d9091fd61d9d - CacheDriver:Adding entry AccessTokenId: b'z4x5kO8/XufT47CgF5HjhNWubRdiJ5dcAxS2GRhTV2o='
+DEBUG - d69e2254-3d06-4709-b1e5-d9091fd61d9d - CacheDriver:Added entry is MRRT
 DEBUG - Starting new HTTPS connection (1): ascend-data-api-dev.azurewebsites.net:443
 DEBUG - https://ascend-data-api-dev.azurewebsites.net:443 "POST /get-data HTTP/1.1" 200 9588
 INFO - Processing product: energy_da

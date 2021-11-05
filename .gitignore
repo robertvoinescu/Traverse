@@ -12,3 +12,7 @@ venv.bak/
 
 # csv
 *.csv
+
+#logs
+*log
+*log.txt
