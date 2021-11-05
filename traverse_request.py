@@ -251,4 +251,4 @@ if __name__ == "__main__":
         output_dataframe(args.output_file,df)
     except Exception:  # pylint: disable=broad-except
         logging.exception("Fatal error in getting traverse data entry point")
-# python .\request.py --start-date '1/1/2020' --end-date '1/2/2020' --node '0096WD_7_N001' --iso 'CAISO' --output-file 'temp2.csc' --log-file 'log'
+# python .\traverse_request.py --start-date '1/1/2020' --end-date '1/2/2020' --node '0096WD_7_N001' --iso 'CAISO' --output-file 'out.csv' --log-file 'log'
