@@ -16,3 +16,7 @@ venv.bak/
 #logs
 *log
 *log.txt
+
+#secure credentials
+*credentials.json
+*credentials
