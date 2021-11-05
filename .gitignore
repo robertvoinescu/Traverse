@@ -10,3 +10,5 @@ venv.bak/
 # pylint files
 *.stats
 
+# csv
+*.csv
