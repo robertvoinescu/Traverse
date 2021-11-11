@@ -235,7 +235,7 @@ def output_dataframe(file, dataframe):
 #        if product not in dataframe.columns:
 #            dataframe[product] = ""
     #dataframe = dataframe.tz_localize(None)
-    dataframe.to_csv(file)
+    dataframe.to_csv(file,index=False)
 
 
 
