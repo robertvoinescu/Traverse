@@ -45,6 +45,11 @@ iso_energy_products = {
 }
 output_energy_products = ["energy_da", "energy_rt"]
 N_PRODUCT_CHUNKS = 1
+PRODUCT_END_DATE_OFFSET = {
+        'energy_rt_5': pd.DateOffset(minutes=5),
+        'energy_rt_15': pd.DateOffset(minutes=15),
+        'energy_da': pd.DateOffset(hours=1)
+}
 
 def parse_args():
     """
@@ -106,6 +111,15 @@ def ping_test():
             if attempt == max_attempts:
                 raise Exception("Unable to reach API. Please try again later")
 
+id_dict = {
+        frozenset(('caiso','0096wd_7_n001','energy_rt_5')):1,
+        frozenset(('caiso','0096wd_7_n001','energy_rt_15')):2,
+        frozenset(('caiso','0096wd_7_n001','energy_da')):3
+        }
+def get_spot_price_id(id_dict,iso,node,product):
+    key = frozenset((iso,node,product))
+    result = id_dict.get(key)
+    return result
 
 def get_stream_data(iso, node, start_date, end_date):
     '''
@@ -135,7 +149,6 @@ def get_stream_data(iso, node, start_date, end_date):
     output_dfs_list = []
     for left_date, right_date in zip(date_range,date_range[1:]):
         logging.info(f'Harvesting data for {left_date} to {right_date}')
-        final_df = pd.DataFrame()
         response = {}
         for products_list in products_chunked:
             data = {}
@@ -190,40 +203,29 @@ def get_stream_data(iso, node, start_date, end_date):
 
             if "message" in response.keys():
                 raise Exception("API call unsuccessful: " + response["message"])
-
+        df_list =[]
         for product in products_use_list:
             logging.info(f'Processing product: {product}')
             columns = response[product]["columns"]
             data = response[product]["data"]
-            values = []
 
-            for val in data:
-                values.append(val[1])
+            timestamp_start_date = pd.to_datetime([val[0] for val in data])
+            timestamp_end_date = timestamp_start_date + PRODUCT_END_DATE_OFFSET[product]
+            prices = [val[1] for val in data]
+            product_data = {'STARTDATE':timestamp_start_date,'ENDDATE':timestamp_end_date,'PRICE':prices, 'product':product,'iso':iso.lower(),'node':node.lower()}
+            product_df = pd.DataFrame(data=product_data)
+            df_list.append(product_df)
 
-            new_set = [x[1] for x in data]
-            if len(final_df.columns) == 0:
-                timestamps = []
-                for val in data:
-                    timestamps.append(val[0])
-                final_df["timestamp"] = timestamps
-                final_df["timestamp"] = pd.to_datetime(final_df["timestamp"])
-                final_df = final_df.set_index("timestamp")
-
-            final_df[product] = new_set
-
-        if iso.lower() == "caiso":
-            final_df['energy_rt'] = np.where(final_df['energy_rt_15'] >= 100, final_df['energy_rt_15'], final_df['energy_rt_5'])
-
-        if iso.lower().replace('iso-ne', 'isone') in ["pjm", "nyiso", "isone"]:
-            final_df = final_df.rename(columns={'energy_rt_5': 'energy_rt'})
-
-        if right_date.year == pd.datetime.now().year:
-            final_df = final_df.reset_index()
-            final_df = final_df.loc[final_df['timestamp'] < pd.datetime.now()].set_index('timestamp')
+        final_df = pd.concat(df_list)
+        final_df = final_df.dropna()
         output_dfs_list.append(final_df)
-
-    return pd.concat(output_dfs_list)
-
+    output_df = pd.concat(output_dfs_list)
+    output_df['STARTDATE'] = output_df['STARTDATE'].dt.strftime('%m%b%Y:%H:%M:%S')
+    output_df['ENDDATE'] = output_df['ENDDATE'].dt.strftime('%m%b%Y:%H:%M:%S')
+    output_df['SPOTPRICEID'] = output_df.apply(lambda col: get_spot_price_id(id_dict,col['iso'],col['node'],col['product']),axis=1)
+    output_df['UPDATEDATETIME'] = pd.Timestamp.now().strftime('%m%b%Y:%H:%M:%S')
+    output_df = output_df[['SPOTPRICEID','STARTDATE','ENDDATE','PRICE','UPDATEDATETIME']]
+    return output_df 
 
 def output_dataframe(file, dataframe):
     """

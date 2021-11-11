@@ -1,4 +1,4 @@
-%macro GetTraverseData( StartDate=,
+%macro GetTraverseRequest( StartDate=,
 			EndDate=,
 			ISO=,
 			Node=,
@@ -30,11 +30,11 @@
 	*/
 
 	/* enesure log file does not overwrite a previous one */ 
-	%let LogFile 	   = "&OutputLogPath\JobId"||trim(left("&JobId."))||"_"||compress(put(datetime(),datetime18.),' :')||"_posdef.log" 
-	%let PosDefSubDir  = Powersimm\sasmacro\ForwardPriceSim;
+	%let LogFile 	   = "&OutputLogPath\JobId"||trim(left("&JobId."))||"_"||compress(put(datetime(),datetime18.),' :')||"_traverse.log" 
+	%let TraverseRequestSubDir  = Powersimm\sasmacro\ForwardPriceSim;
 	%let WorkDirectory = %sysfunc(getoption(work));
 
-	filename pos "&WorkDirectory.\GetTraverseData.bat";
+	filename pos "&WorkDirectory.\GetTraverseRequest.bat";
 
 
 	/*
@@ -44,16 +44,16 @@
 	data _null_;
 		file pos;
 		pythonpath = %sysfunc(quote("C:\Program Files\Python37\python.exe"));
-		msgline = pythonpath || " &BookMacroCodeBase.\&PosDefSubDir.\PosDefRunIt.py --start-date &StartDate. --end-date &EndDate. --node &Node. --iso &ISO. --output-file &WorkDirectory.\&OutputFile..csv --log-file &WorkDirectory.\&LogFile.";
+		msgline = pythonpath || " &BookMacroCodeBase.\&TraverseRequestSubDir.\TraverseRequest.py --start-date &StartDate. --end-date &EndDate. --node &Node. --iso &ISO. --output-file &WorkDirectory.\&OutputFile..csv --log-file &WorkDirectory.\&LogFile.";
 		put msgline; 
 	run;
 
 	options noxwait xsync;
-	x "&WorkDirectory.\GetTraverseData.bat";
+	x "&WorkDirectory.\GetTraverseRequest.bat";
 
 	
 	proc import datafile="&WorkDirectory.\&OutputFile..csv" out=&OutputFile. dbms=csv replace;
 		guessingrows=max;
 	run;
 
-%mend PosDefRunIt;
+%mend TraverseRequestRunIt;
