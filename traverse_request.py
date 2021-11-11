@@ -231,10 +231,10 @@ def output_dataframe(file, dataframe):
     """
     Writes dataframe to file with missing products as empty
     """
-    for product in output_energy_products:
-        if product not in dataframe.columns:
-            dataframe[product] = ""
-    dataframe = dataframe.tz_localize(None)
+#    for product in output_energy_products:
+#        if product not in dataframe.columns:
+#            dataframe[product] = ""
+    #dataframe = dataframe.tz_localize(None)
     dataframe.to_csv(file)
 
 
