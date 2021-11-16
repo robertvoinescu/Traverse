@@ -45,7 +45,8 @@ run;
 						 LookupIdList=&LookupIdValues.,
 						 outputTable=_OutputTable&currentSpotPriceId.,
 					     dataStartDate=&dataStartDate.,
-						 dataEndDate=&dataEndDate.);
+						 dataEndDate=&dataEndDate.,
+						 SpotPriceId=&currentSpotPriceId.);
 
 
 

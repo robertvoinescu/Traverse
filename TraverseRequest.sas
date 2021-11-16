@@ -1,5 +1,6 @@
 %macro GetTraverseRequest( StartDate=,
 			EndDate=,
+			SpotpriceId=,
 			Query=,
 			OutputTable=);
 	/* 
@@ -53,7 +54,7 @@
 	data _null_;
 		file pos;
 		pythonpath = %sysfunc(quote("C:\Program Files\Python37\python.exe"));
-		msgline = pythonpath || " &BookMacroCodeBase.\&TraverseRequestSubDir.\TraverseRequest.py --start-date &StartDate. --end-date &EndDate. --query &Query. --output-file &WorkDirectory.\&OutputFile..csv --log-file &WorkDirectory.\&LogFile.";
+		msgline = pythonpath || " &BookMacroCodeBase.\&TraverseRequestSubDir.\traverse_request.py --output-file &WorkDirectory.\&OutputFile..csv --log &WorkDirectory.\&LogFile. --start-date &StartDate. --end-date &EndDate. --spot-price-id &SpotpriceId  --powersimm-query '&Query.'";
 		put msgline; 
 	run;
 

@@ -3,7 +3,8 @@
 						 LookupIdList=2 3,
 						 outputTable=OutputTable,
 					     dataStartDate=,
-						 dataEndDate=);
+						 dataEndDate=,
+						 SpotPriceId=);
 
 %if &InputTableMapId= %then %do;
 
@@ -75,5 +76,5 @@ run;
 	quit;
 %end;
 %else %do;
-	%TraverseRequest(StartDate=&MostCurrentDate., EndDate=&dataEndDate.,Query=&EXTENDEDQUERYSTRING.,OutputTable=&outputTable.);
+	%TraverseRequest(StartDate=&MostCurrentDate., EndDate=&dataEndDate.,SpotpriceId=&SpotpriceId.,Query=&lookupIdList,OutputTable=&outputTable.);
 %mend GetInputTableData;

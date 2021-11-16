@@ -73,6 +73,10 @@ def parse_args():
         required=True,
     )
     parser.add_argument(
+        "--powersimm-query",
+        required=True,
+    )
+    parser.add_argument(
         "--start-date",
         required=False,
     )
@@ -124,11 +128,6 @@ id_dict = {
         frozenset(('caiso','0096wd_7_n001','energy_rt_15')):2,
         frozenset(('caiso','0096wd_7_n001','energy_da')):3
         }
-
-def get_spot_price_id(id_dict,iso,node,product):
-    key = frozenset((iso,node,product))
-    result = id_dict.get(key)
-    return result
 
 def get_response_json(iso,node,product,start_date,end_date):
     logging.info(f'Harvesting data for {start_date} to {end_date}')
@@ -219,29 +218,8 @@ def update_df_to_powersimm_format(df,spot_price_id):
     df[UPDATE_DATETIME_NAME] = pd.Timestamp.now().strftime('%m%b%Y:%H:%M:%S')
     df[SPOT_PRICE_ID_NAME] = spot_price_id
 
-    # map the iso node and product to spotprice id
     df = df[[SPOT_PRICE_ID_NAME,START_DATE_NAME,END_DATE_NAME,PRICE_NAME,UPDATE_DATETIME_NAME]]
     return df 
-
-ACCEPTED_INPUT_ISO_LIST = ["caiso","ercot","isone","nyiso","spp","pjm","miso"]
-MAP_INPUT_PRODUCT = {
-        'da':'energy_da',
-        'rt':'energy_rt_5'
-        }
-
-def get_iso_node_product(desc):
-    try:
-        desc = desc.lower()
-        iso_node = desc.split('\\')[-1]
-        iso = iso_node.split('_')[0]
-        node = '_'.join(iso_node.split('_')[1:])
-        product = MAP_INPUT_PRODUCT.get(desc.split('\\')[-2])
-        if iso in ACCEPTED_INPUT_ISO_LIST and product is not None:
-            return dict(iso=iso, node=node, product=product)
-        else:
-            return None
-    except:
-        return None
 
 if __name__ == "__main__":
     try:
@@ -252,23 +230,18 @@ if __name__ == "__main__":
             logging.basicConfig(level=logging.DEBUG,filename=args.log_file, filemode='w', format='%(levelname)s - %(message)s')
         logging.debug('\n\nCALLING TRAVERSE\n\n')
 
-        spot_price_id_table = pd.read_csv('~\Desktop\spotpriceid.csv')
-        spot_price_id_table = spot_price_id_table[[SPOT_PRICE_ID_NAME,DESCRIPTION_NAME]]
-        spot_price_id_table[SPOT_PRICE_ID_NAME] = spot_price_id_table[SPOT_PRICE_ID_NAME].astype(str)
-        spot_price_id_table['key'] = spot_price_id_table[DESCRIPTION_NAME].apply(get_iso_node_product)
-        map_from_spot_id = spot_price_id_table[[SPOT_PRICE_ID_NAME,'key']].set_index(SPOT_PRICE_ID_NAME)
-        map_from_spot_id = map_from_spot_id['key'].to_dict()
-
         start_date = pd.to_datetime(args.start_date)
         end_date = pd.to_datetime(args.end_date)
+        powersimm_query = args.powersimm_query.lower()
+        iso_node_product_dict = {x.split('=')[0]:x.split('=')[1] for x in powersimm_query.split(',')}
 
         try:
-            iso     = map_from_spot_id[args.spot_price_id]['iso'] 
-            node    = map_from_spot_id[args.spot_price_id]['node'] 
-            product = map_from_spot_id[args.spot_price_id]['product'] 
+            iso     = iso_node_product_dict['iso'] 
+            node    = iso_node_product_dict['node'] 
+            product = iso_node_product_dict['product'] 
         except IndexError as e:
             logging.info(e)
-            logging.info(f'Spot price ID table is ill defined for {args.spot_price_id}')
+            logging.info(f"Need query='iso=,node=,product=' got query={args.powersimm_query}")
 
         df = get_stream_data_as_long_df(iso,node,product,start_date,end_date)
         df = update_df_to_powersimm_format(df,args.spot_price_id)
@@ -278,11 +251,9 @@ if __name__ == "__main__":
 
     except Exception:  # pylint: disable=broad-except
         logging.exception("Fatal error in getting traverse data entry point")
-        pirnt('hello')
         try:
             empty_df = pd.DataFrame(columns=[SPOT_PRICE_ID_NAME,START_DATE_NAME,END_DATE_NAME,PRICE_NAME,UPDATE_DATETIME_NAME])
             empty_df.to_csv(args.output_file,index=False)
         except:
             logging.exception("Cannot produce empty df please specify output-file")
-
-# python .\traverse_request.py --output-file 'out.csv' --log-file 'log'--start-date '1/1/2020' --end-date '1/2/2020' --spot-price-id 20307205
+# python .\traverse_request.py --output-file 'out.csv' --log-file 'log'--start-date '1/1/2020' --end-date '1/2/2020' --spot-price-id 20307205 --powersimm-query 'iso=CAISO,node=0096WD_7_N001,product=energy_rt_5' 
