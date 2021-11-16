@@ -1,7 +1,6 @@
 %macro GetTraverseRequest( StartDate=,
 			EndDate=,
-			ISO=,
-			Node=,
+			Query=,
 			OutputTable=);
 	/* 
 	Returns all energy products for the specified node and iso found on Traverse.
@@ -20,6 +19,10 @@
 	BookMacroCodebase: Specifies the location of the codebase 
 	OutputLogPath: Specifies where the logs are stored
 
+	Necessary Tables
+	----------------
+	SpotPriceIdTable: specifies the correspondence between (iso,node,product) and spotpriceid
+
 	Creates
 	-------
 	OutputTable: (sas dataset) the data loaded from Traverse
@@ -30,9 +33,15 @@
 	*/
 
 	/* enesure log file does not overwrite a previous one */ 
-	%let LogFile 	   = "&OutputLogPath\JobId"||trim(left("&JobId."))||"_"||compress(put(datetime(),datetime18.),' :')||"_traverse.log" 
+	/*
+	%let LogFile 	   = "&OutputLogPath\JobId"||trim(left("&JobId."))||"_"||compress(put(datetime(),datetime18.),' :')||"_traverse.log"; 
 	%let TraverseRequestSubDir  = Powersimm\sasmacro\ForwardPriceSim;
 	%let WorkDirectory = %sysfunc(getoption(work));
+	*/
+	
+	%let LogFile 	   = "~\Desktop\log"; 
+	%let TraverseRequestSubDir  = "~\Desktop";
+	%let WorkDirectory = "~\Desktop";
 
 	filename pos "&WorkDirectory.\GetTraverseRequest.bat";
 
@@ -44,7 +53,7 @@
 	data _null_;
 		file pos;
 		pythonpath = %sysfunc(quote("C:\Program Files\Python37\python.exe"));
-		msgline = pythonpath || " &BookMacroCodeBase.\&TraverseRequestSubDir.\TraverseRequest.py --start-date &StartDate. --end-date &EndDate. --node &Node. --iso &ISO. --output-file &WorkDirectory.\&OutputFile..csv --log-file &WorkDirectory.\&LogFile.";
+		msgline = pythonpath || " &BookMacroCodeBase.\&TraverseRequestSubDir.\TraverseRequest.py --start-date &StartDate. --end-date &EndDate. --query &Query. --output-file &WorkDirectory.\&OutputFile..csv --log-file &WorkDirectory.\&LogFile.";
 		put msgline; 
 	run;
 
@@ -56,4 +65,4 @@
 		guessingrows=max;
 	run;
 
-%mend TraverseRequestRunIt;
+%mend GetTraverseRequestRunIt;
