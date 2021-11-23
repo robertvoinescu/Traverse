@@ -40,70 +40,161 @@ run;
 
 %SysErrReturn;
 
-%GetInputTableData(InputTableMapId=&InputTableMapId.,
-	                     InputTableIdDescription=SpotPriceDataTable,
-						 LookupIdList=&LookupIdValues.,
-						 outputTable=_OutputTable&currentSpotPriceId.,
-					     dataStartDate=&dataStartDate.,
-						 dataEndDate=&dataEndDate.,
-						 SpotPriceId=&currentSpotPriceId.);
+data AddSpotPriceDataTable;
+	set powersim.spotPriceDataTable(where=(spotPriceId=&currentSpotPriceId. and price ne . and startdate ne .
+		and enddate ne .));
+run;
 
-
-
-/* find date for most current data */
-proc sql;
-	select max(&DATVARIABLE.) into :MostCurrentDate format=date9.
-	from &outputTable.
-quit;
-
-/* fill in the */
-%if %sysfunc(compress("&dataEndDate.")) ne "" and &MostCurrentDate le &dataEndDate. %then %do;
-	%TraverseRequest(StartDate=&MostCurrentDate., EndDate=&dataEndDate.,SpotPriceId=&currentSpotPriceId.,OutputTable=AddAPIDataTable);
+%if %symexist(ReloadSpotPriceData)=0 %then %do;
+	%global ReloadSpotPriceData;
+	%let ReloadSpotPriceData=1;
 %end;
 
-data AddSpotPriceDataTable;
-	_OutputTable&currentSpotPriceId.
-	set powersim.spotPriceDataTable(where=(spotPriceId=&currentSpotPriceId. and price ne .));
-run;
+%if %sysevalf(&ReloadSpotPriceData. ne 0) %then %do;
 
-data _OutputTable&currentSpotPriceId.;
-	set _OutputTable&currentSpotPriceId.(where=(price ne .)) /* JRF - 2/10/21 - Anand and I decided it makes more sense to just use the specified source - AddSpotPriceDataTable */;
-	spotPriceId=&currentSpotPriceId.;
-	if updateDateTime gt &scheduledRunDateTimeNum. then delete;
-
-	/*
-
-	if endDate gt intnx('dtday',&scheduledRunDateTimeNum.,0,'e') then delete;
-
-	*/
-
-	%if %symexist(SpotPriceEndDateTime) %then %do;
-
-		if endDate gt intnx('dtday',&SpotPriceEndDateTime.,0,'e') then delete;
-
-	%end;
-
-	/* 2012-11-09 SN: filter out bad data */
-	if startdate=. or endDate=. then delete;
-
-
-
-	%if %symexist(GetMinSpotHistDate) %then %do;
-
-		if startDate lt &GetMinSpotHistDate. then delete;
-
-	%end;
-
-	/* SNB added on Nov 25 2017 to take care of end of day prices  */
-
-	if hour(endDate)=23 and minute(endDate)=59 then endDate=intnx('hour',endDate,1,'b');
+	%let maxPSSpotUPDATE=1;
+	%let minDataENDDATE=1;
+	%let maxDataENDDATE=1;
 	
-run;
+	proc sql noprint;
+		select put(max(UPDATEDATETIME),15.0),put(min(ENDDATE),15.0),put(max(ENDDATE),15.)
+				into :maxPSSpotUPDATE,:minDataENDDATE,:maxDataENDDATE
+		from AddSpotPriceDataTable;
+	quit;
+	
+	%let reloadData=0;
+	
+	data _null_;
+		if intnx('dtday',&scheduledRunDateTimeNum.,-1,'b') gt
+				&maxPSSpotUPDATE. then reloadData=1;
+		else reloadData=0;
+		call symputx('reloadData',reloadData);
+		call symputx('minDateToReload',max( 1, intnx('dtmonth',&maxDataENDDATE.,-1,'b')) );
+	run;
+	
+	/*  SNB updated 2013-01-24 to prevent reload of data if attemptNumber gt 1 
+		in case of nMarket database outages
+	*/
+	
+	%if %sysevalf(&attemptNumber. gt 1) %then %let reloadData=0;
+	
+	%if %sysevalf(&reloadData. ne 0) %then %do;
+		%let LookupIdValues = "&LookupIdValues";
+		%GetInputTableData(InputTableMapId=&InputTableMapId.,
+			                     InputTableIdDescription=SpotPriceDataTable,
+								 LookupIdList=&LookupIdValues.,
+								 outputTable=_OutputTable&currentSpotPriceId.,
+							     dataStartDate=&minDateToReload.,
+								 dataEndDate=&dataEndDate.);
+	
+		data _OutputTable&currentSpotPriceId.;
+			set _OutputTable&currentSpotPriceId.(where=(price ne .)) AddSpotPriceDataTable;
+			updateDateTime=updateDateTime;
+			spotPriceId=&currentSpotPriceId.;
+			if updateDateTime gt &scheduledRunDateTimeNum. then delete;
+			if endDate gt intnx('dtday',&scheduledRunDateTimeNum.,0,'e') then delete;
+		run;
+	
+		proc sort data=_OutputTable&currentSpotPriceId.;
+			by spotPriceId /* startDate */ endDate updateDateTime;
+		run;
+	
+		data _OutputTable&currentSpotPriceId.;
+			set _OutputTable&currentSpotPriceId.;
+			by spotPriceId /* startDate */ endDate;
+	
+			if startDate=endDate then delete;
+	
+			if last.endDate then output;
+		run;
+	
+		proc sort data=_OutputTable&currentSpotPriceId. nodupkey;
+			by spotPriceId startDate endDate;
+		run;
+	
+		proc sort data=AddSpotPriceDataTable out=AddSpotPriceDataTableFinal;
+			by spotPriceId /* startDate */ endDate updateDateTime;
+		run;
+	
+		data AddSpotPriceDataTableFinal;
+			set AddSpotPriceDataTableFinal;
+			by spotPriceId /* startDate */ endDate;
+	
+			if startDate=endDate then delete;
+	
+			if last.endDate then output;
+			
+		run;
+	
+		proc sort data=AddSpotPriceDataTableFinal nodupkey;
+			by spotPriceId startDate endDate;
+		run;
+	
+		proc compare base=AddSpotPriceDataTableFinal compare=_OutputTable&currentSpotPriceId.
+							out=NewPricesToAdd1 outcomp outnoequal
+							noprint
+							;
+			by spotpriceid startdate enddate;
+			var price;
+		run;
+	
+		data NewPricesToAdd2;
+			merge AddSpotPriceDataTableFinal(in=aa)
+				  _OutputTable&currentSpotPriceId.(in=bb);
+			by spotpriceid startdate enddate;
+			if bb and not aa then output;
+		run;
+	
+		data NewPricesToAdd;
+			set NewPricesToAdd1 NewPricesToAdd2;
+		run;
+	
+		proc sort data=NewPricesToAdd nodupkey;
+			by spotPriceId startDate endDate;
+		run;
+	
+		proc append data=NewPricesToAdd (drop=updateDateTime)
+					base=powersim.spotpricedatatable force;
+		run;
+		quit;
+	%end;
+	
+	%else %do;
+	
+		data _OutputTable&currentSpotPriceId.;
+			set AddSpotPriceDataTable;
+			updateDateTime=updateDateTime;
+			spotPriceId=&currentSpotPriceId.;
+			if updateDateTime gt &scheduledRunDateTimeNum. then delete;
+			if endDate gt intnx('dtday',&scheduledRunDateTimeNum.,0,'e') then delete;
+		run;
+	
+	%end;
+	
+%end;
+
+%else %do;
+
+	%GetInputTableData(InputTableMapId=&InputTableMapId.,
+		                     InputTableIdDescription=SpotPriceDataTable,
+							 LookupIdList=&LookupIdValues.,
+							 outputTable=_OutputTable&currentSpotPriceId.,
+						     dataStartDate=&dataStartDate.,
+							 dataEndDate=&dataEndDate.);
+	
+	data _OutputTable&currentSpotPriceId.;
+		set _OutputTable&currentSpotPriceId.(where=(price ne .)) AddSpotPriceDataTable;
+		spotPriceId=&currentSpotPriceId.;
+		if updateDateTime gt &scheduledRunDateTimeNum. then delete;
+		if endDate gt intnx('dtday',&scheduledRunDateTimeNum.,0,'e') then delete;
+	run;
+
+%end;
 
 %SysErrReturn;
 
 proc sort data=_OutputTable&currentSpotPriceId.;
-	by spotPriceId /* startDate */ endDate updateDateTime price;
+	by spotPriceId /* startDate */ endDate updateDateTime;
 run;
 
 %SysErrReturn;
@@ -135,9 +226,9 @@ run;
 
 data _OutputTable2x&currentSpotPriceId.;
 	set _OutputTable&currentSpotPriceId.;
-	eventDateTime=intnx("&expandInt.", startDate, 0, 'b');
+	eventDateTime=startDate;
 	output;
-	eventDateTime=intnx("&expandInt.", EndDate-1, 0, 'e')+1;
+	eventDateTime=EndDate;
 	output;
 run;
 
@@ -157,35 +248,35 @@ quit;
 		by SpotPriceId rowN eventDateTime; 
 	run;
 
-	proc expand data=_OutputTable2x&currentSpotPriceId. out=_OutputTable2xEXP&currentSpotPriceId. to=&expandInt. method=step;
+	proc expand data=_OutputTable2x&currentSpotPriceId. out=_OutputTable2xEXP&currentSpotPriceId. to=hour1 method=step;
 		by SpotPriceId rowN;
 		id eventDateTime;
 		var price;
 	run;
 	quit;
 
-%SysErrReturn;
-
-data _SpotPriceDataTable&currentSpotPriceId.;
-	set _OutputTable2xEXP&currentSpotPriceId.;
-	by SpotPriceId rowN;
-	if first.rowN then delete;
-	drop rowN;
-run;
-
-%SysErrReturn;
-
-proc means noprint nway data=_SpotPriceDataTable&currentSpotPriceId.;
-     class SpotPriceId eventDateTime;
-	 var price;
-	 output out=_hourlyPrices&currentSpotPriceId.(drop=_type_ _freq_) mean=;
-run;
-
-%SysErrReturn;
-
-proc append base=&OutputTable. data=_hourlyPrices&currentSpotPriceId. force;
-run;
-
+	%SysErrReturn;
+	
+	data _SpotPriceDataTable&currentSpotPriceId.;
+		set _OutputTable2xEXP&currentSpotPriceId.;
+		by SpotPriceId rowN;
+		if first.rowN then delete;
+		drop rowN;
+	run;
+	
+	%SysErrReturn;
+	
+	proc means noprint nway data=_SpotPriceDataTable&currentSpotPriceId.;
+	     class SpotPriceId eventDateTime;
+		 var price;
+		 output out=_hourlyPrices&currentSpotPriceId.(drop=_type_ _freq_) mean=;
+	run;
+	
+	%SysErrReturn;
+	
+	proc append base=&OutputTable. data=_hourlyPrices&currentSpotPriceId. force;
+	run;
+	
 %end;
 
 %else %do;
@@ -195,45 +286,13 @@ run;
 		eventDateTime=.;
 		price=.;
 
-		/*
-
 		if eventDateTime gt intnx('dtday',&scheduledRunDateTimeNum.,0,'e') then delete;
-
-		*/
 		format eventDateTime datetime.;
 	run;
 
 
-proc append base=&OutputTable. data=_hourlyPrices&currentSpotPriceId.(obs=0) force;
-run;
-
-
-%end;
-
-/* VK 2018-08-07 this section makes everything hourly.  Need to make it conditional on timestep actually being hourly */
-data _null_;
-	TakeHourlyMean = index(upcase("&expandInt."), 'HOUR');
-	call symputx('TakeHourlyMean', TakeHourlyMean);
-run;
-
-%if %sysevalf(&TakeHourlyMean. gt 0) %then %do;
-
-data &outputTable.;
-	set &outputTable.;
-	hour = intnx('hour', eventDateTime, 0, 'b');
-run;
-
-proc means data=&outputTable. noprint nway;
-	class hour spotpriceid;
-	output out=_hourlyOutput mean(price)=price;
-run;
-
-data &outputTable.;
-	set _hourlyOutput;
-	eventDateTime = hour;
-	keep eventDateTime spotPriceId price;
-run;
-
+	proc append base=&OutputTable. data=_hourlyPrices&currentSpotPriceId.(obs=0) force;
+	run;
 %end;
 
 
@@ -247,8 +306,6 @@ proc sql;
 	drop table _hourlyPrices&currentSpotPriceId.;
 quit;
 
-%end;
-
 proc sql;
 	drop table _currentSpotPriceIdTable;
     drop table _spotPriceIdTable;
@@ -256,26 +313,18 @@ quit;
 
 %if %sysfunc(exist(&OutputTable.))=0 %then %do;
 
-data &OutputTable.;
-	SpotPriceId=.;
-	eventDateTime=.;
-	price=.;
-run;
-
-
-data &OutputTable.;
-	set &outputTable(obs=0);
-run;
-
-%end;
-
-%if %symexist(SpotPriceNoise) %then %do;
-
 	data &OutputTable.;
-		set &OutputTable.;
-		price=price * (1 + rannor(1234) * &SpotPriceNoise.);
+		SpotPriceId=.;
+		eventDateTime=.;
+		price=.;
+	run;
+	
+	
+	data &OutputTable.;
+		set &outputTable(obs=0);
 	run;
 
 %end;
 
 %mend getSpotPriceData;
+

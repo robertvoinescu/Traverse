@@ -44,7 +44,6 @@ iso_energy_products = {
     "miso": ["energy_da", "energy_rt"],
 }
 output_energy_products = ["energy_da", "energy_rt"]
-N_PRODUCT_CHUNKS = 1
 PRODUCT_END_DATE_OFFSET = {
         'energy_rt_5': pd.DateOffset(minutes=5),
         'energy_rt_15': pd.DateOffset(minutes=15),
@@ -57,10 +56,9 @@ PRODUCT_NAME = 'PRODUCT'
 PRICE_NAME = 'PRICE'
 ISO_NAME = 'ISO'
 NODE_NAME = 'NODE'
-SPOT_PRICE_ID_NAME = 'SPOTPRICEID'
 UPDATE_DATETIME_NAME = 'UPDATEDATETIME'
 TIMESTAMP_NAME = 'TIMESTAMP'
-DESCRIPTION_NAME = 'DESCRIPTION'
+POWERSIMM_DATE_FORMAT = '%d%b%Y:%H:%M:%S'
 
 
 def parse_args():
@@ -68,10 +66,6 @@ def parse_args():
     Utility method for parsing command line arguments.
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--spot-price-id",
-        required=True,
-    )
     parser.add_argument(
         "--powersimm-query",
         required=True,
@@ -122,12 +116,6 @@ def ping_test():
             logging.info(e)
             if attempt == max_attempts:
                 raise Exception("Unable to reach API. Please try again later")
-
-id_dict = {
-        frozenset(('caiso','0096wd_7_n001','energy_rt_5')):1,
-        frozenset(('caiso','0096wd_7_n001','energy_rt_15')):2,
-        frozenset(('caiso','0096wd_7_n001','energy_da')):3
-        }
 
 def get_response_json(iso,node,product,start_date,end_date):
     logging.info(f'Harvesting data for {start_date} to {end_date}')
@@ -209,19 +197,19 @@ def get_stream_data_as_long_df(iso, node,product, start_date, end_date):
     df = pd.concat(output_df_list)
     return df 
 
-def update_df_to_powersimm_format(df,spot_price_id):
+def update_df_to_powersimm_format(df):
     # assume traverse always returns timestamp beggining
     df[START_DATE_NAME] = df[TIMESTAMP_NAME] 
     df[END_DATE_NAME]   = df[[TIMESTAMP_NAME,PRODUCT_NAME]].apply(lambda row: row[TIMESTAMP_NAME]+PRODUCT_END_DATE_OFFSET[row[PRODUCT_NAME]],axis=1)
-    df[START_DATE_NAME] = df[START_DATE_NAME].dt.strftime('%m%b%Y:%H:%M:%S')
-    df[END_DATE_NAME]   = df[END_DATE_NAME].dt.strftime('%m%b%Y:%H:%M:%S')
-    df[UPDATE_DATETIME_NAME] = pd.Timestamp.now().strftime('%m%b%Y:%H:%M:%S')
-    df[SPOT_PRICE_ID_NAME] = spot_price_id
+    df[START_DATE_NAME] = df[START_DATE_NAME].dt.strftime(POWERSIMM_DATE_FORMAT)
+    df[END_DATE_NAME]   = df[END_DATE_NAME].dt.strftime(POWERSIMM_DATE_FORMAT)
+    df[UPDATE_DATETIME_NAME] = pd.Timestamp.now().strftime(POWERSIMM_DATE_FORMAT)
+    df = df[[START_DATE_NAME,END_DATE_NAME,PRICE_NAME,UPDATE_DATETIME_NAME]]
 
-    df = df[[SPOT_PRICE_ID_NAME,START_DATE_NAME,END_DATE_NAME,PRICE_NAME,UPDATE_DATETIME_NAME]]
     return df 
 
 if __name__ == "__main__":
+
     try:
         args = parse_args()
         try:
@@ -230,8 +218,8 @@ if __name__ == "__main__":
             logging.basicConfig(level=logging.DEBUG,filename=args.log_file, filemode='w', format='%(levelname)s - %(message)s')
         logging.debug('\n\nCALLING TRAVERSE\n\n')
 
-        start_date = pd.to_datetime(args.start_date)
-        end_date = pd.to_datetime(args.end_date)
+        start_date = pd.to_datetime(args.start_date,format=POWERSIMM_DATE_FORMAT)
+        end_date = pd.to_datetime(args.end_date,format=POWERSIMM_DATE_FORMAT)
         powersimm_query = args.powersimm_query.lower()
         iso_node_product_dict = {x.split('=')[0]:x.split('=')[1] for x in powersimm_query.split(',')}
 
@@ -242,9 +230,9 @@ if __name__ == "__main__":
         except IndexError as e:
             logging.info(e)
             logging.info(f"Need query='iso=,node=,product=' got query={args.powersimm_query}")
-
+        
         df = get_stream_data_as_long_df(iso,node,product,start_date,end_date)
-        df = update_df_to_powersimm_format(df,args.spot_price_id)
+        df = update_df_to_powersimm_format(df)
         df.dropna(inplace=True)
         df.to_csv(args.output_file,index=False)
         
@@ -252,8 +240,9 @@ if __name__ == "__main__":
     except Exception:  # pylint: disable=broad-except
         logging.exception("Fatal error in getting traverse data entry point")
         try:
-            empty_df = pd.DataFrame(columns=[SPOT_PRICE_ID_NAME,START_DATE_NAME,END_DATE_NAME,PRICE_NAME,UPDATE_DATETIME_NAME])
+            empty_df = pd.DataFrame(columns=[START_DATE_NAME,END_DATE_NAME,PRICE_NAME,UPDATE_DATETIME_NAME])
             empty_df.to_csv(args.output_file,index=False)
         except:
             logging.exception("Cannot produce empty df please specify output-file")
-# python .\traverse_request.py --output-file 'out.csv' --log-file 'log'--start-date '1/1/2020' --end-date '1/2/2020' --spot-price-id 20307205 --powersimm-query 'iso=CAISO,node=0096WD_7_N001,product=energy_rt_5' 
+# python .\traverse_request.py --output-file 'out.csv' --log-file 'log'--start-date '01Jan2018:00:00:00' --end-date '02Jan2018:00:00:00' --powersimm-query 'iso=CAISO,node=0096WD_7_N001,product=energy_rt_5' 
+

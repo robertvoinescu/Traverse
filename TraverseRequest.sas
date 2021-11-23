@@ -1,28 +1,18 @@
 %macro GetTraverseRequest( StartDate=,
 			EndDate=,
-			SpotpriceId=,
 			Query=,
-			OutputTable=);
+			OutFile=);
 	/* 
 	Returns all energy products for the specified node and iso found on Traverse.
 
 	Params
 	------
-	StartDate: (str) A timestamp specifying the the start of the daterange lookup for data.
-	EndDate: (str)  A timestamp specifying the the start of the daterange lookup for data.
-	ISO: (str) The ISO (Independent Systems Operator) we wish to pull our data from
-	Node: (str) The node for which we want to call the  
-	OutputTable: (str) The name which we give the loaded sas data set
-
-	Global Params
-	-------------
-	WorkingDirectory: Specifies the location of the working directory 
-	BookMacroCodebase: Specifies the location of the codebase 
-	OutputLogPath: Specifies where the logs are stored
-
-	Necessary Tables
-	----------------
-	SpotPriceIdTable: specifies the correspondence between (iso,node,product) and spotpriceid
+	StartDate: (str) A timestamp specifying the the start of the daterange lookup for data
+		in 01Jan2020:00:00:00 format.
+	EndDate: (str)  A timestamp specifying the the start of the daterange lookup for data
+		in 01Jan2020:00:00:00 format.
+	Query: (str) specifies the iso node and output with format "iso=yourIso,node=yourNode,product=yourProduct"
+	OutFile: (str) specifies the name of the output sas dataset 
 
 	Creates
 	-------
@@ -30,40 +20,42 @@
 
 	Notes
 	-----
-	Currently this only loads in energy data.
+	Currently this only loads in energy_rt5, energy_rt15 and energy_da data.
 	*/
 
 	/* enesure log file does not overwrite a previous one */ 
-	/*
 	%let LogFile 	   = "&OutputLogPath\JobId"||trim(left("&JobId."))||"_"||compress(put(datetime(),datetime18.),' :')||"_traverse.log"; 
-	%let TraverseRequestSubDir  = Powersimm\sasmacro\ForwardPriceSim;
 	%let WorkDirectory = %sysfunc(getoption(work));
-	*/
+	%let PythonTraverseRequestSubDir  = Powersimm\sasmacro\PowerSimmSystemTools\Python;
 	
-	%let LogFile 	   = "~\Desktop\log"; 
-	%let TraverseRequestSubDir  = "~\Desktop";
-	%let WorkDirectory = "~\Desktop";
-
-	filename pos "&WorkDirectory.\GetTraverseRequest.bat";
+	/* query comes in quoted but bat files inherently include quotes around the parameters so need to remove here */
+	%let Query = %sysfunc(dequote(&Query));
 
 
-	/*
-	A bat file is created and run because trying to run the command directly with the x macro doesnt work in batch mode
-	(although it will work interactively)
-	*/
+	/* for debugging purposes it is best to keep all the bat files using a counter suffix */
+	%if %symexist(TraverseCallCounter)=0 %then %do;
+		%global TraverseCallCounter;
+		%let TraverseCallCounter=0;
+	%end;
+	%let TraverseCallCounter=%sysevalf(&TraverseCallCounter.+1);
+
+	filename pos "&WorkDirectory.\GetTraverseRequest_&TraverseCallCounter..bat";
+
+	/* A bat file is created and run because trying to run the command directly with the x macro doesnt work in batch mode
+	   (although it will work interactively) */
 	data _null_;
 		file pos;
 		pythonpath = %sysfunc(quote("C:\Program Files\Python37\python.exe"));
-		msgline = pythonpath || " &BookMacroCodeBase.\&TraverseRequestSubDir.\traverse_request.py --output-file &WorkDirectory.\&OutputFile..csv --log &WorkDirectory.\&LogFile. --start-date &StartDate. --end-date &EndDate. --spot-price-id &SpotpriceId  --powersimm-query '&Query.'";
+		msgline = pythonpath || " &BookMacroCodeBase.\&PythonTraverseRequestSubDir.\traverse_request.py --output-file &WorkDirectory.\&OutFile..csv --log &WorkDirectory.\&LogFile. --start-date &StartDate. --end-date &EndDate. --powersimm-query &Query.";
 		put msgline; 
 	run;
 
 	options noxwait xsync;
-	x "&WorkDirectory.\GetTraverseRequest.bat";
+	x "&WorkDirectory.\GetTraverseRequest_&TraverseCallCounter..bat";
 
-	
-	proc import datafile="&WorkDirectory.\&OutputFile..csv" out=&OutputFile. dbms=csv replace;
+	proc import datafile="&WorkDirectory.\&OutFile..csv" out=&OutFile. dbms=csv replace;
 		guessingrows=max;
 	run;
 
-%mend GetTraverseRequestRunIt;
+%mend GetTraverseRequest;
+

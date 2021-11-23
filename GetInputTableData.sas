@@ -3,8 +3,7 @@
 						 LookupIdList=2 3,
 						 outputTable=OutputTable,
 					     dataStartDate=,
-						 dataEndDate=,
-						 SpotPriceId=);
+						 dataEndDate=);
 
 %if &InputTableMapId= %then %do;
 
@@ -54,27 +53,49 @@ data _null_;
 	call symput(trim(left(_name_)),trim(left(col1)) );
 run;
 
-%put TRAVERSE_API_TABLE_NAME = "Traverse API";
-%if &TABLEMANE. ne &TRAVERSE_API_TABLE_NAME.  %then %do;
-	proc sql;
-		create table &outputTable. as
-		select &selectStatement
-		from &SASLIBNAME..&TABLENAME.
-		where &LOOKUPIDVARIABLE. in (&LookupIdList.)
-			%if %sysfunc(compress("&EXTENDEDQUERYSTRING.")) ne "" %then %do;
-			   AND &EXTENDEDQUERYSTRING.
-			%end;
-	        %if %sysfunc(compress("&DATEVARIABLE.")) ne "" %then %do;
-			  %if %sysfunc(compress("&dataStartDate.")) ne "" %then %do;
-			       and &DATEVARIABLE. ge &dataStartDate.
-			  %end;
-			  %if %sysfunc(compress("&dataEndDate.")) ne "" %then %do;
-			       and &DATEVARIABLE. le &dataEndDate.
-			  %end;
-			%end;
-		;
-	quit;
+
+%if &TABLENAME. = TraverseAPI %then %do;
+	%if %sysfunc(compress("&dataEndDate.")) = "" %then %do;
+		%let dataEndDate= %sysfunc(datetime());
+	%end;
+	%let OneHourInSeconds = %sysevalf(60*50*24);
+	%if %sysfunc(compress("&dataStartDate.")) = "" %then %do;
+		%let dataStartDate= %eval(&dataEndDate.-&OneHourInSeconds.);
+	%end;
+	/* python doesn't understand sas input for datetime so need to convert
+	   to datetime 20 formated characters */
+	data _null_;
+		dtCharStart=put(&dataStartDate., DATETIME20.);
+		call symput('dataStartDate',dtCharStart);
+		dtCharEnd=put(&dataEndDate., DATETIME20.);
+		call symput('dataEndDate',dtCharEnd);
+	run;
+	%GetTraverseRequest(StartDate=&dataStartDate., EndDate=&dataEndDate.,Query=&LookupIdList,OutFile=&outputTable.);
 %end;
 %else %do;
-	%TraverseRequest(StartDate=&MostCurrentDate., EndDate=&dataEndDate.,SpotpriceId=&SpotpriceId.,Query=&lookupIdList,OutputTable=&outputTable.);
+	data _null_;
+		MacroVariableNoQuotes = compress(&LookupIdList.,'"');
+		call symput('LookupIdList',MacroVariableNoQuotes);
+	run;
+	
+	proc sql;
+			create table &outputTable. as
+			select &selectStatement
+			from &SASLIBNAME..&TABLENAME.
+			where &LOOKUPIDVARIABLE. in (&LookupIdList.)
+				%if %sysfunc(compress("&EXTENDEDQUERYSTRING.")) ne "" %then %do;
+				   AND &EXTENDEDQUERYSTRING.
+				%end;
+		        %if %sysfunc(compress("&DATEVARIABLE.")) ne "" %then %do;
+				  %if %sysfunc(compress("&dataStartDate.")) ne "" %then %do;
+				       and &DATEVARIABLE. ge &dataStartDate.
+				  %end;
+				  %if %sysfunc(compress("&dataEndDate.")) ne "" %then %do;
+				       and &DATEVARIABLE. le &dataEndDate.
+				  %end;
+				%end;
+			;
+		quit;
+%end;
 %mend GetInputTableData;
+
