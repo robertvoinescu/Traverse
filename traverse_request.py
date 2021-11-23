@@ -172,10 +172,11 @@ def get_response_json(iso,node,product,start_date,end_date):
         raise Exception("API call unsuccessful: " + response["message"])
     return response
 
-def get_stream_data_as_long_df(iso, node,product, start_date, end_date):
+def get_stream_data_as_long_df(iso, node, product, start_date, end_date):
     '''
-    Makes a call to the get-data endpoint returns the results. Given node and iso it will return
-    all energy products present for the specified date range.
+    Makes a call to the get-data endpoint returns the results. Given node, iso and product it will return
+    the market values.
+
     '''
     ping_test()
     
