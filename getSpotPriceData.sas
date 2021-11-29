@@ -306,6 +306,8 @@ proc sql;
 	drop table _hourlyPrices&currentSpotPriceId.;
 quit;
 
+%end;
+
 proc sql;
 	drop table _currentSpotPriceIdTable;
     drop table _spotPriceIdTable;
@@ -327,4 +329,3 @@ quit;
 %end;
 
 %mend getSpotPriceData;
-
