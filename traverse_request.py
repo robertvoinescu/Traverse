@@ -381,8 +381,7 @@ if __name__ == "__main__":
             start_year = start_date.year
             end_year = (end_date - pd.Timedelta('1 day')).year
             start_date = pd.to_datetime(f"1/1/{start_year}")
-            end_date = pd.to_datetime(f"1/2/{start_year}")
-            #max(end_year,start_year+1)
+            end_date = pd.to_datetime(f"1/2/{max(end_year,start_year+1)}")
         output_folder = args.output_folder
         iso     = args.iso.lower()
         nodes    = args.nodes.lower().split(',')
